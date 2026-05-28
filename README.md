@@ -1,2 +1,0 @@
-# agenda-ceo
-AGENDA ESTRATÉGICA
