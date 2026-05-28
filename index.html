@@ -3258,7 +3258,9 @@
 
             win.document.write(html); win.document.close();
             setTimeout(()=>win.print(),800);
-        },
+        }
+
+    };  // ── fim UIController ─────────────────────────────────────
 
     // ══════════════════════════════════════════════════════════
     //  IA PROATIVA SERVICE — Etapa 6
@@ -3352,6 +3354,10 @@
         _showSugestao(s) {
             const area = document.getElementById('notificationArea');
             if(!area) return;
+            const id = 'ia_' + Date.now();
+            // Guardar referência à função numa variável global temporária
+            window._iaActions = window._iaActions || {};
+            window._iaActions[id] = s.fn;
             const el = document.createElement('div');
             el.className = 'notification-toast pointer-events-auto bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden';
             el.style.cssText = 'max-width:300px;';
@@ -3363,13 +3369,17 @@
                 </div>
                 <div style="padding:10px 12px;">
                     <div style="font-size:10px;color:#475569;text-transform:uppercase;margin-bottom:8px;line-height:1.5;">${s.body}</div>
-                    <button onclick="${s.fn.toString().replace(/"/g,"'")};this.closest('.notification-toast').remove();"
+                    <button data-ia-id="${id}"
                         style="background:#0F172A;color:white;border:none;border-radius:6px;padding:5px 12px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">
                         ${s.acao} →
                     </button>
                 </div>`;
+            // Listener no botão de ação (evita problemas com onclick inline)
+            el.querySelector('[data-ia-id]').addEventListener('click', () => {
+                try { window._iaActions[id]?.(); } catch(e){}
+                el.remove();
+            });
             area.appendChild(el);
-            // Auto-remover em 12s
             setTimeout(()=>{ if(el.parentNode) { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),300); }}, 12000);
         }
     };
@@ -3385,7 +3395,7 @@
             { task:'✝ DEVOCIONAL MATINAL',              time:'06:00', blockType:'Reino',          type:'Devocional',       recurrenceRule:'daily',   papel:'',       empresa:''            },
             { task:'S&OP SEMANAL — NORMATEC',            time:'08:00', blockType:'Estrategico',    type:'S&OP',             recurrenceRule:'weekly',  papel:'CEO',    empresa:''            },
             { task:'REVISÃO FINANCEIRA — LUCILENE',      time:'09:00', blockType:'Administrativo', type:'ADM / Financeiro',  recurrenceRule:'weekly',  papel:'CEO',    empresa:'',           responsavel:'Lucilene' },
-            { task:'ALINHAMENTO COMERCIAL — JORGE',      time:'11:00', blockType:'Comercial',      type:'Comercial',        recurrenceRule:'weekly',  papel:'Comercial','empresa:''        },
+            { task:'ALINHAMENTO COMERCIAL — JORGE',      time:'11:00', blockType:'Comercial',      type:'Comercial',        recurrenceRule:'weekly',  papel:'Comercial', empresa:''         },
             { task:'REVISÃO DE PRODUÇÃO — RENATO',       time:'14:00', blockType:'Operacional',    type:'Produção',         recurrenceRule:'weekly',  papel:'CEO',    empresa:''            },
             { task:'AVALIAÇÃO DE LÍDERES — SEMESTRAL',   time:'09:00', blockType:'Estrategico',    type:'Estratégico',      recurrenceRule:'monthly', papel:'CEO',    empresa:''            },
             { task:'REVISÃO SEMANAL GUIADA',             time:'08:00', blockType:'Estrategico',    type:'Estratégico',      recurrenceRule:'weekly',  papel:'CEO',    empresa:''            },
